@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.keycloak.admin.client.CreatedResponseUtil.getCreatedId;
 
 @Service
@@ -86,7 +85,7 @@ public class KeycloakServiceImpl implements KeycloakService {
         return keycloakUser;
     }
 
-    private Keycloak getKeycloakInstance(){
+    private Keycloak getKeycloakInstance() {
         return Keycloak.getInstance(keycloakProperties.getAuthServerUrl(),
                 keycloakProperties.getMasterRealm(), keycloakProperties.getMasterUser()
                 , keycloakProperties.getMasterUserPswd(), keycloakProperties.getMasterClient());

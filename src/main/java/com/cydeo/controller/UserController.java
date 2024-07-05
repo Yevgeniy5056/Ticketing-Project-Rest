@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    @RolesAllowed("{Admin}")
+    @RolesAllowed("Admin")
     public ResponseEntity<ResponseWrapper> getUserByUsername(@PathVariable("username") String username) {
 
         return ResponseEntity.ok(ResponseWrapper.builder()
@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @PostMapping
-    @RolesAllowed("{Admin}")
+    @RolesAllowed("Admin")
     public ResponseEntity<ResponseWrapper> createUser(@RequestBody UserDTO user) {
 
         userService.save(user);
@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @PutMapping
-    @RolesAllowed("{Admin}")
+    @RolesAllowed("Admin")
     public ResponseEntity<ResponseWrapper> updateUser(@RequestBody UserDTO user) {
 
         userService.update(user);
@@ -66,7 +66,7 @@ public class UserController {
     }
 
     @DeleteMapping("{username}")
-    @RolesAllowed("{Admin}")
+    @RolesAllowed("Admin")
     public ResponseEntity<ResponseWrapper> deleteUser(@PathVariable("username") String username) {
 
         userService.delete(username);

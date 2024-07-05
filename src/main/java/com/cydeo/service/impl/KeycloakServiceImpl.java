@@ -29,20 +29,7 @@ public class KeycloakServiceImpl implements KeycloakService {
     @Override
     public Response userCreate(UserDTO userDTO) {
 
-        CredentialRepresentation credential = new CredentialRepresentation();
-        credential.setType(CredentialRepresentation.PASSWORD);
-        credential.setTemporary(false);
-        credential.setValue(userDTO.getPassWord());
-
-        UserRepresentation keycloakUser = new UserRepresentation();
-        keycloakUser.setUsername(userDTO.getUserName());
-        keycloakUser.setFirstName(userDTO.getFirstName());
-        keycloakUser.setLastName(userDTO.getLastName());
-        keycloakUser.setEmail(userDTO.getUserName());
-        keycloakUser.setCredentials(asList(credential));
-        keycloakUser.setEmailVerified(true);
-        keycloakUser.setEnabled(true);
-
+        UserRepresentation keycloakUser = getUserRepresentation(userDTO);
 
         Keycloak keycloak = getKeycloakInstance();
 
@@ -80,6 +67,23 @@ public class KeycloakServiceImpl implements KeycloakService {
         usersResource.delete(uid);
 
         keycloak.close();
+    }
+
+    private UserRepresentation getUserRepresentation(UserDTO userDTO) {
+        CredentialRepresentation credential = new CredentialRepresentation();
+        credential.setType(CredentialRepresentation.PASSWORD);
+        credential.setTemporary(false);
+        credential.setValue(userDTO.getPassWord());
+
+        UserRepresentation keycloakUser = new UserRepresentation();
+        keycloakUser.setUsername(userDTO.getUserName());
+        keycloakUser.setFirstName(userDTO.getFirstName());
+        keycloakUser.setLastName(userDTO.getLastName());
+        keycloakUser.setEmail(userDTO.getUserName());
+        keycloakUser.setCredentials(List.of(credential));
+        keycloakUser.setEmailVerified(true);
+        keycloakUser.setEnabled(true);
+        return keycloakUser;
     }
 
     private Keycloak getKeycloakInstance(){

@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +41,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO findByUserName(String username) {
         User user = userRepository.findByUserNameAndIsDeleted(username, false);
+        if (user == null) throw new NoSuchElementException("User not found");
         return userMapper.convertToDto(user);
     }
 
@@ -50,16 +52,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void save(UserDTO user) {
+    public UserDTO save(UserDTO user) {
 
         user.setEnabled(true);
 
         User obj = userMapper.convertToEntity(user);
 
-        userRepository.save(obj);
+        User savedUser = userRepository.save(obj);
 
         keycloakService.userCreate(user);
 
+        return userMapper.convertToDto(savedUser);
     }
 
 //    @Override

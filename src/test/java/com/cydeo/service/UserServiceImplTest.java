@@ -17,8 +17,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
@@ -112,6 +113,9 @@ public class UserServiceImplTest {
 
         //then
         assertEquals(expectedList, actualList);
+        assertThat(actualList).usingRecursiveComparison().isEqualTo(expectedList);
 
+        verify(userRepository, times(1)).findAllByIsDeletedOrderByFirstNameDesc(false);
+        verify(userRepository, never()).findAllByIsDeletedOrderByFirstNameDesc(true);
     }
 }

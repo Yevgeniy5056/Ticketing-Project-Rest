@@ -155,6 +155,6 @@ public class UserServiceImplTest {
 
         assertEquals(expectedPassword, savedUser.getPassWord());
 
-        verify(passwordEncoder).encode(anyString());
+        verify(passwordEncoder, times(1)).encode(anyString());
     }
 }

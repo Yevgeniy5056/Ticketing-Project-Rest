@@ -4,6 +4,7 @@ import com.cydeo.dto.RoleDTO;
 import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.Role;
 import com.cydeo.entity.User;
+import com.cydeo.exception.TicketingProjectException;
 import com.cydeo.mapper.UserMapper;
 import com.cydeo.repository.UserRepository;
 import com.cydeo.service.impl.UserServiceImpl;
@@ -20,8 +21,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -95,6 +95,17 @@ public class UserServiceImplTest {
         userDTO2.setFirstName("Emily");
 
         return List.of(userDTO, userDTO2);
+    }
+
+    private User getUserWithRole(String role) {
+
+        User user = new User();
+        user.setUserName("User3");
+        user.setPassWord("Abc1");
+        user.setEnabled(true);
+        user.setIsDeleted(false);
+        user.setRole(new Role(role));
+        return user;
     }
 
     @AfterEach
@@ -175,5 +186,35 @@ public class UserServiceImplTest {
 
         verify(passwordEncoder, times(1)).encode(anyString());
 
+    }
+
+    @Test
+    public void should_delete_manager() throws TicketingProjectException {
+
+        User managerUser = getUserWithRole("Manager");
+
+        when(userRepository.findByUserNameAndIsDeleted(anyString(), anyBoolean())).thenReturn(managerUser);
+        when(userRepository.save(any())).thenReturn(managerUser);
+        when(projectService.listAllNonCompletedByAssignedManager(any())).thenReturn(List.of());
+
+        userService.delete(managerUser.getUserName());
+
+        assertTrue(managerUser.getIsDeleted());
+        assertNotEquals("user3", managerUser.getUserName());
+    }
+
+    @Test
+    public void should_delete_employee() throws TicketingProjectException {
+
+        User emplpoyeeUser = getUserWithRole("Employee");
+
+        when(userRepository.findByUserNameAndIsDeleted(anyString(), anyBoolean())).thenReturn(emplpoyeeUser);
+        when(userRepository.save(any())).thenReturn(emplpoyeeUser);
+        when(taskService.listAllNonCompletedByAssignedEmployee(any())).thenReturn(List.of());
+
+        userService.delete(emplpoyeeUser.getUserName());
+
+        assertTrue(emplpoyeeUser.getIsDeleted());
+        assertNotEquals("user3", emplpoyeeUser.getUserName());
     }
 }

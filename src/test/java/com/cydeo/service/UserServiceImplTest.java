@@ -157,4 +157,23 @@ public class UserServiceImplTest {
 
         verify(passwordEncoder, times(1)).encode(anyString());
     }
+
+    @Test
+    void should_encode_user_password_on_update_operation() {
+
+        when(userRepository.findByUserNameAndIsDeleted(anyString(), anyBoolean())).thenReturn(user);
+        when(userMapper.convertToEntity(any(UserDTO.class))).thenReturn(user);
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userMapper.convertToDto(any(User.class))).thenReturn(userDTO);
+        when(passwordEncoder.encode(anyString())).thenReturn("some-password");
+
+        String expectedPassword = "some-password";
+
+        UserDTO updatedUser = userService.update(userDTO);
+
+        assertEquals(expectedPassword, updatedUser.getPassWord());
+
+        verify(passwordEncoder, times(1)).encode(anyString());
+
+    }
 }

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -36,6 +37,8 @@ public class UserServiceImplTest {
     private TaskService taskService;
     @Mock
     private KeycloakService keycloakService;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -136,5 +139,22 @@ public class UserServiceImplTest {
         assertEquals("User not found", actualException.getMessage());
 
 //        Throwable actualException = catchThrowable(()-> userService.findByUserName("SomeUsername"));
+    }
+
+    @Test
+    public void should_encode_user_password_on_save_operation() {
+
+        when(userMapper.convertToEntity(any(UserDTO.class))).thenReturn(user);
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userMapper.convertToDto(any(User.class))).thenReturn(userDTO);
+        when(passwordEncoder.encode(anyString())).thenReturn("some-password");
+
+        String expectedPassword = "some-password";
+
+        UserDTO savedUser = userService.save(userDTO);
+
+        assertEquals(expectedPassword, savedUser.getPassWord());
+
+        verify(passwordEncoder).encode(anyString());
     }
 }
